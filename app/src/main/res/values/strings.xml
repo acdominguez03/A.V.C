@@ -1,0 +1,26 @@
+<resources>
+    <string name="app_name">A.V.C</string>
+
+    <!-- home -->
+    <string name="cocacola">Coca-Cola</string>
+    <string name="stock">Stock</string>
+    <string name="edit">Editar</string>
+    <string name="home_title">Bebidas y helados</string>
+    <string name="historical">Historial</string>
+    <string name="money">Dinero</string>
+    <string name="add">Añadir</string>
+    <string name="substract">Restar</string>
+
+    <!-- Add tickets View -->
+    <string name="add_title">Añadir productos</string>
+    <string name="price">Precio</string>
+
+    <!-- Delivery View -->
+    <string name="delivery_title">Añadir entrega</string>
+    <string name="paid">Pagado</string>
+    <string name="no_paid">No pagado</string>
+    <string name="invitation">Invitación</string>
+
+    <!-- Expenses View -->
+    <string name="expenses_title">Gastos</string>
+</resources>
