@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.toSize
 import com.example.avc.R
 import com.example.avc.composables.CustomTopBar
-import com.example.avc.domain.model.Product
+import com.example.avc.database.entity.ProductEntity
 
 @Composable
 fun ExpensesScreen() {
@@ -51,22 +51,22 @@ fun ExpensesScreen() {
                 val items = remember {
                     mutableStateListOf<ProductSale>(
                         ProductSale(
-                            product = Product(
+                            product = ProductEntity(
                                 id = 0,
                                 name = "Coca-Cola",
                                 price = 1.0,
-                                image = 0,
-                                stock = 10
+                                image = "",
+                                amount = 10
                             ),
                             quantity = 4
                         ),
                         ProductSale(
-                            product = Product(
+                            product = ProductEntity(
                                 id = 0,
                                 name = "Coca-Cola Zero",
                                 price = 1.0,
-                                image = 0,
-                                stock = 10
+                                image = "",
+                                amount = 10
                             ),
                             quantity = 2
                         )
@@ -246,6 +246,6 @@ fun ProductItem(productSale: ProductSale) {
 }
 
 data class ProductSale(
-    val product: Product,
+    val product: ProductEntity,
     val quantity: Int
 )

@@ -1,7 +1,10 @@
 package com.example.avc.presentation
 
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.modifier.modifierLocalMapOf
 import androidx.navigation.compose.rememberNavController
 import com.example.avc.composables.custom_tab_bar.BottomBar
 import com.example.avc.composables.custom_tab_bar.BottomNavGraph
@@ -16,6 +19,9 @@ fun MainScreen() {
             )
         }
     ) { paddingValues ->
-        BottomNavGraph(navController = navController)
+        BottomNavGraph(
+            navController = navController,
+            modifier = Modifier.padding(paddingValues)
+        )
     }
 }

@@ -20,10 +20,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.avc.R
+import com.example.avc.database.entity.ProductEntity
 
-@Preview(widthDp = 150, heightDp = 180)
 @Composable
-fun AddItem() {
+fun AddItem(
+    product: ProductEntity
+) {
     var quantity by remember { mutableStateOf(0) }
     var showDialog by remember { mutableStateOf(false) }
 
@@ -38,56 +40,59 @@ fun AddItem() {
             horizontalArrangement = Arrangement.spacedBy(20.dp, alignment = Alignment.CenterHorizontally),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Box {
+            Box(modifier = Modifier.fillMaxWidth()) {
                 Image(
                     modifier = Modifier
                         .width(70.dp)
-                        .height(70.dp),
-                    painter = painterResource(id = R.drawable.ic_cocacola),
+                        .height(70.dp)
+                        .padding(start = 10.dp)
+                        .align(Alignment.CenterStart),
+                    painter = painterResource(id = product.image.mapToMyImageResource()),
                     contentDescription = stringResource(
                         id = R.string.cocacola
                     )
                 )
-            }
-
-            Text(
-                text = "Coca-Cola",
-                fontSize = 20.sp
-            )
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(
-                    10.dp,
-                    alignment = Alignment.CenterHorizontally
-                ),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Image(
-                    modifier = Modifier
-                        .clickable { if (quantity > 0) quantity-- }
-                        .size(50.dp),
-                    painter = painterResource(id = R.drawable.ic_substract),
-                    contentDescription = stringResource(
-                        id = R.string.substract
-                    )
-                )
 
                 Text(
-                    modifier = Modifier.clickable { showDialog = true },
-                    text = quantity.toString(),
+                    modifier = Modifier.padding(start = 80.dp).align(Alignment.CenterStart),
+                    text = product.name,
                     fontSize = 20.sp
                 )
 
-                Image(
-                    modifier = Modifier
-                        .clickable { quantity++ }
-                        .size(50.dp),
-                    painter = painterResource(id = R.drawable.ic_add),
-                    contentDescription = stringResource(
-                        id = R.string.substract
+                Row(
+                    modifier = Modifier.align(Alignment.CenterEnd),
+                    horizontalArrangement = Arrangement.spacedBy(
+                        10.dp,
+                        alignment = Alignment.CenterHorizontally
+                    ),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Image(
+                        modifier = Modifier
+                            .clickable { if (quantity > 0) quantity-- }
+                            .size(50.dp),
+                        painter = painterResource(id = R.drawable.ic_substract),
+                        contentDescription = stringResource(
+                            id = R.string.substract
+                        )
                     )
-                )
+
+                    Text(
+                        modifier = Modifier.clickable { showDialog = true },
+                        text = quantity.toString(),
+                        fontSize = 20.sp
+                    )
+
+                    Image(
+                        modifier = Modifier
+                            .clickable { quantity++ }
+                            .size(50.dp),
+                        painter = painterResource(id = R.drawable.ic_add),
+                        contentDescription = stringResource(
+                            id = R.string.substract
+                        )
+                    )
+                }
             }
         }
     }

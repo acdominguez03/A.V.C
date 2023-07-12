@@ -1,5 +1,6 @@
 package com.example.avc.composables
 
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.* // ktlint-disable no-wildcard-imports
@@ -19,11 +20,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.avc.R
-import com.example.avc.domain.model.Product
+import com.example.avc.database.entity.ProductEntity
 
 @Composable
 fun HomeItem(
-    product: Product
+    product: ProductEntity
 ) {
     val circleBackground = colorResource(id = R.color.green)
 
@@ -43,7 +44,7 @@ fun HomeItem(
                     modifier = Modifier
                         .width(70.dp)
                         .height(70.dp),
-                    painter = painterResource(id = product.image),
+                    painter = painterResource(product.image.mapToMyImageResource()),
                     contentDescription = stringResource(
                         id = R.string.cocacola
                     )
@@ -80,7 +81,7 @@ fun HomeItem(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.Center
                     ) {
-                        Text(product.stock.toString())
+                        Text(product.amount.toString())
                         Spacer(modifier = Modifier.width(2.dp))
                         Image(
                             painter = painterResource(id = R.drawable.ic_stock),
@@ -104,3 +105,30 @@ fun HomeItem(
         }
     }
 }
+
+
+@DrawableRes
+fun String.mapToMyImageResource() : Int =
+    when (this) {
+        "R.drawable.ic_cocacola" -> {
+            R.drawable.ic_cocacola
+        }
+        "R.drawable.ic_fanta" -> {
+            R.drawable.ic_fanta
+        }
+        "R.drawable.ic_aquarius" -> {
+            R.drawable.ic_aquarius
+        }
+        "R.drawable.ic_nestea" -> {
+            R.drawable.ic_nestea
+        }
+        "R.drawable.ic_beer" -> {
+            R.drawable.ic_beer
+        }
+        "R.drawable.ic_beer0" -> {
+            R.drawable.ic_beer0
+        }
+        else -> {
+            R.drawable.ic_icecream
+        }
+    }

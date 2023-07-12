@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
@@ -15,14 +17,22 @@ import com.example.avc.R
 import com.example.avc.composables.CustomTopBar
 import com.example.avc.composables.HomeItem
 import com.example.avc.composables.custom_tab_bar.BottomBarScreen
-import com.example.avc.domain.model.Product
+import com.example.avc.database.entity.ProductEntity
+import com.example.avc.presentation.viewModel.HomeViewModel
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun HomeScreen(
-    navController: NavController
+    navController: NavController,
+    viewModel: HomeViewModel = koinViewModel(),
+    modifier: Modifier
 ) {
+    val products by viewModel.allProducts.collectAsState(
+        initial = emptyList()
+    )
+
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .background(color = colorResource(id = R.color.background))
     ) {
@@ -32,26 +42,28 @@ fun HomeScreen(
             withProfits = true,
             modifier = Modifier
                 .size(40.dp)
-                .clickable { navController.navigate(BottomBarScreen.Tickets.route) }
+                .clickable {
+                    navController.navigate(BottomBarScreen.Tickets.route)
+                }
         )
 
         Column(
-            modifier = Modifier.fillMaxSize().padding(30.dp),
+            modifier = Modifier.fillMaxSize().padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
             LazyVerticalGrid(
                 columns = GridCells.Fixed(2),
-                verticalArrangement = Arrangement.spacedBy(10.dp),
-                horizontalArrangement = Arrangement.spacedBy(10.dp)
+                verticalArrangement = Arrangement.spacedBy(20.dp),
+                horizontalArrangement = Arrangement.spacedBy(20.dp)
             ) {
-                items(10) { item ->
+                items(products.size) { index ->
                     HomeItem(
-                        product = Product(
-                            id = 0,
-                            name = "Coca-Cola",
-                            price = 1.0,
-                            image = R.drawable.ic_cocacola,
-                            stock = 10
+                        product = ProductEntity(
+                            id = products[index].id,
+                            name = products[index].name,
+                            price = products[index].price,
+                            image = products[index].image,
+                            amount = products[index].amount
                         )
                     )
                 }

@@ -17,12 +17,19 @@ import com.example.avc.R
 import com.example.avc.composables.AddItem
 import com.example.avc.composables.CustomTextField
 import com.example.avc.composables.CustomTopBar
+import com.example.avc.presentation.viewModel.AddTicketsViewModel
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun AddTicketsScreen() {
+fun AddTicketsScreen(
+    viewModel: AddTicketsViewModel = koinViewModel()
+) {
     var priceText by remember {
         mutableStateOf("")
     }
+    val products by viewModel.allProducts.collectAsState(
+        initial = emptyList()
+    )
 
     Column(
         modifier = Modifier
@@ -43,8 +50,10 @@ fun AddTicketsScreen() {
                 modifier = Modifier.heightIn(0.dp, 590.dp),
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                items(9) { item ->
-                    AddItem()
+                items(products.size) { index ->
+                    AddItem(
+                        product = products[index]
+                    )
                 }
             }
 

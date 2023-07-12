@@ -16,9 +16,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.avc.R
+import com.example.avc.database.entity.ProductEntity
 
 @Composable
-fun DeliveryItem() {
+fun DeliveryItem(
+    product: ProductEntity
+) {
     Card(
         modifier = Modifier.fillMaxSize(),
         shape = RoundedCornerShape(10.dp)
@@ -26,19 +29,18 @@ fun DeliveryItem() {
         Column(
             modifier = Modifier.fillMaxWidth()
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(top = 10.dp, bottom = 5.dp),
-                horizontalArrangement = Arrangement
-                    .spacedBy(20.dp, alignment = Alignment.CenterHorizontally),
-                verticalAlignment = Alignment.CenterVertically
+            Box(
+                modifier = Modifier.fillMaxWidth().padding(top = 10.dp, bottom = 5.dp)
             ) {
                 Text(
-                    text = "Coca-Cola Zero",
+                    modifier = Modifier.align(Alignment.CenterStart).padding(start = 20.dp),
+                    text = product.name,
                     fontSize = 25.sp,
                     fontWeight = FontWeight.ExtraBold
                 )
 
                 CustomDropDownMenu(
+                    modifier = Modifier.align(Alignment.CenterEnd).padding(end = 20.dp),
                     values = arrayOf("1", "2", "3", "4", "5"),
                     text = "Cantidad: "
                 )
@@ -58,6 +60,7 @@ fun DeliveryItem() {
 
 @Composable
 fun CustomDropDownMenu(
+    modifier: Modifier,
     values: Array<String>,
     text: String?
 ) {
@@ -66,7 +69,7 @@ fun CustomDropDownMenu(
     var currentValue by remember { mutableStateOf(values[0]) }
 
     Row(
-        modifier = Modifier
+        modifier = modifier
             .clickable { expanded = !expanded }
     ) {
         Text(
