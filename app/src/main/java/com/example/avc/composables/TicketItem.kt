@@ -3,6 +3,7 @@ package com.example.avc.composables
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.Text
@@ -12,13 +13,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.avc.database.entity.ProductPerTicketEntity
+import com.example.avc.database.entity.TicketEntity
+import com.example.avc.presentation.utils.DateUtil
+import com.example.avc.presentation.viewModel.TicketState
+import com.example.avc.presentation.viewModel.TicketViewModel
 
-@Preview
 @Composable
-fun TicketItem() {
+fun TicketItem(
+    ticket: TicketEntity,
+    viewModel: TicketViewModel
+) {
     Card(
         modifier = Modifier
             .clip(RoundedCornerShape(20.dp))
@@ -39,12 +46,12 @@ fun TicketItem() {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = "Ticket 24/07/2023",
+                    text = "Ticket ${DateUtil.convertLongToTime(ticket.date)}",
                     fontSize = 25.sp,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = "50€",
+                    text = "${ticket.price}€",
                     fontSize = 25.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -58,8 +65,11 @@ fun TicketItem() {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                items(6) {
-                    ProductItemTicket()
+                items(viewModel.getProductsForOneTicket(ticketId = ticket.id)) {
+                    ProductItemTicket(
+                        viewModel = viewModel,
+                        product = it
+                    )
                 }
             }
         }
@@ -67,17 +77,20 @@ fun TicketItem() {
 }
 
 @Composable
-fun ProductItemTicket() {
+fun ProductItemTicket(
+    viewModel: TicketViewModel,
+    product: ProductPerTicketEntity
+) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "Coca-Cola -> ",
+            text = "${viewModel.getNameOfTheProduct(product.productId)} -> ",
             fontSize = 20.sp
         )
         Text(
-            text = "4 unidades",
+            text = "${product.amount} unidades",
             fontSize = 20.sp
         )
     }

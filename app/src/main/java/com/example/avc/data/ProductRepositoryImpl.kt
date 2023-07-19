@@ -34,7 +34,7 @@ class ProductRepositoryImpl(
         try {
             productDAO.insert(productEntity)
         } catch (e: IOException) {
-            Log.d("MY_TAG", "Error añadir el producto a la BBDD")
+            Log.d("MY_TAG", "Error al añadir el producto a la BBDD")
         }
     }
 
@@ -42,7 +42,15 @@ class ProductRepositoryImpl(
         try {
             productDAO.insertAll(products)
         } catch (e: IOException) {
-            Log.d("MY_TAG", "Error añadir los productos a la BBDD")
+            Log.d("MY_TAG", "Error al añadir los productos a la BBDD")
+        }
+    }
+
+    override suspend fun updateProducts(products: List<ProductEntity>) {
+        try {
+            productDAO.updateProducts(products)
+        } catch (e: IOException) {
+            Log.d("MY_TAG", "Error al actualizar los productos de la BBDD")
         }
     }
 }

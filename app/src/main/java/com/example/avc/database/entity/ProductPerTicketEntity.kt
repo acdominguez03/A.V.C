@@ -21,8 +21,13 @@ import androidx.room.PrimaryKey
     ]
 )
 data class ProductPerTicketEntity(
-    @PrimaryKey(autoGenerate = true) val id: Int,
-    @ColumnInfo(name = "amount") val amount: Int,
-    @ColumnInfo(name = "id_product") val productId: Int,
-    @ColumnInfo(name = "id_ticket") val ticketId: Int
-)
+    @ColumnInfo(name = "amount") var amount: Int,
+    @ColumnInfo(name = "id_product") val productId: Long,
+    @ColumnInfo(name = "id_ticket") val ticketId: Long
+) {
+    @PrimaryKey(autoGenerate = true)
+    var id: Long = 0
+        set(id) {
+            field = id + 1
+        }
+}

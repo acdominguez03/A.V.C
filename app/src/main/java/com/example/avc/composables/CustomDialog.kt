@@ -19,14 +19,19 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.example.avc.R
+import com.example.avc.database.entity.ProductEntity
+import com.example.avc.domain.model.TicketItem
+import com.example.avc.presentation.viewModel.AddTicketsState
+import com.example.avc.presentation.viewModel.AddTicketsViewModel
 
 @Composable
 fun CustomDialog(
     onDismiss: () -> Unit,
-    onConfirm: (String) -> Unit,
-    product: String
+    onConfirm: (Int) -> Unit,
+    product: TicketItem,
+    state: AddTicketsState,
+    uiEvent: (AddTicketsViewModel.AddTicketsEvent) -> Unit
 ) {
-    var text by remember { mutableStateOf("") }
 
     Dialog(
         onDismissRequest = {
@@ -55,15 +60,17 @@ fun CustomDialog(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "¿Cuántas unidades quieres añadir de $product?",
+                    text = "¿Cuántas unidades quieres añadir de ${product.productName}?",
                     textAlign = TextAlign.Center,
                     fontSize = 16.sp
                 )
 
                 CustomTextField(
-                    value = text,
+                    value = state.dialogText,
                     onValueChange = {
-                        text = it
+                        uiEvent(
+                            AddTicketsViewModel.AddTicketsEvent.OnDialogTextChanged(text = it)
+                        )
                     },
                     leadingIcon = {
                         Icon(
@@ -103,8 +110,8 @@ fun CustomDialog(
 
                     Button(
                         onClick = {
-                            if (text.isNotEmpty()) {
-                                onConfirm(text)
+                            if (state.dialogText.isNotEmpty()) {
+                                onConfirm(state.dialogText.toInt())
                             }
                         },
                         colors = ButtonDefaults.buttonColors(

@@ -22,10 +22,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.toSize
 import com.example.avc.R
+import com.example.avc.database.entity.UserEntity
 
 @Composable
 fun CustomDropDownMenuTextField(
-    items: List<String>
+    items: List<UserEntity>
 ) {
     var text by remember { mutableStateOf("") }
     var textFieldSize by remember { mutableStateOf(Size.Zero) }
@@ -99,20 +100,20 @@ fun CustomDropDownMenuTextField(
                         if (text.isNotEmpty()) {
                             items(
                                 items.filter {
-                                    it.lowercase()
+                                    it.name.lowercase()
                                         .contains(text.lowercase())
-                                }.sorted()
+                                }
                             ) {
-                                PersonItem(title = it) { title ->
+                                PersonItem(title = it.name) { title ->
                                     text = title
                                     expanded = false
                                 }
                             }
                         } else {
                             items(
-                                items.sorted()
+                                items
                             ) {
-                                PersonItem(title = it) { title ->
+                                PersonItem(title = it.name) { title ->
                                     text = title
                                     expanded = false
                                 }

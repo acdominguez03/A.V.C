@@ -6,7 +6,7 @@ import androidx.room.OnConflictStrategy
 import com.example.avc.database.entity.DeliveryEntity
 
 @Dao
-interface DeliveryDao {
+interface DeliveryDAO {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(deliveryEntity: DeliveryEntity)
 }

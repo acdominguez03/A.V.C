@@ -1,5 +1,7 @@
 package com.example.avc.presentation
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -8,11 +10,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.rounded.ArrowDropDown
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -49,7 +53,7 @@ fun ExpensesScreen() {
         ) {
             items(4) {
                 val items = remember {
-                    mutableStateListOf<ProductSale>(
+                    mutableStateListOf(
                         ProductSale(
                             product = ProductEntity(
                                 id = 0,
@@ -172,27 +176,8 @@ fun ExpensesItem(
                             modifier = Modifier
                                 .padding(vertical = 1.dp),
                             background = {
-                                val color = when (dismissState.dismissDirection) {
-                                    DismissDirection.StartToEnd -> Color.Transparent
-                                    DismissDirection.EndToStart -> Color.Red
-                                    null -> Color.Transparent
-                                }
-
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .background(color)
-                                        .padding(8.dp)
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.Delete,
-                                        contentDescription = null,
-                                        tint = Color.White,
-                                        modifier = Modifier.align(Alignment.CenterEnd)
-                                    )
-                                }
+                                SwipeBackground(dismissState = dismissState)
                             },
-                            directions = setOf(DismissDirection.EndToStart),
                             dismissContent = {
                                 ProductItem(productSale = item)
                             }
@@ -201,6 +186,46 @@ fun ExpensesItem(
                 }
             }
         }
+    }
+}
+
+@Composable
+@OptIn(ExperimentalMaterialApi::class)
+fun SwipeBackground(dismissState: DismissState) {
+    val direction = dismissState.dismissDirection ?: return
+
+    val color by animateColorAsState(
+        when (dismissState.targetValue) {
+            DismissValue.Default -> Color.LightGray
+            DismissValue.DismissedToEnd -> Color.Green
+            DismissValue.DismissedToStart -> Color.Red
+        }
+    )
+    val alignment = when (direction) {
+        DismissDirection.StartToEnd -> Alignment.CenterStart
+        DismissDirection.EndToStart -> Alignment.CenterEnd
+    }
+    val icon = when (direction) {
+        DismissDirection.StartToEnd -> Icons.Default.Edit
+        DismissDirection.EndToStart -> Icons.Default.Delete
+    }
+    val scale by animateFloatAsState(
+        if (dismissState.targetValue == DismissValue.Default) 0.75f else 1f
+    )
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(color)
+            .padding(8.dp),
+        contentAlignment = alignment
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = Color.White,
+            modifier = Modifier.align(Alignment.CenterEnd).scale(scale)
+        )
     }
 }
 

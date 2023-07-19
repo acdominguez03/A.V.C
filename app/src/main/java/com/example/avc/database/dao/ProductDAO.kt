@@ -19,4 +19,14 @@ interface ProductDAO {
 
     @Query("DELETE FROM product_table")
     fun deleteAllProducts()
+
+    @Query("UPDATE product_table SET amount = :amount WHERE id = :id")
+    suspend fun update(amount: Int, id: Long)
+
+    @Transaction
+    suspend fun updateProducts(list: List<ProductEntity>) {
+        list.forEach {
+            update(it.amount, it.id)
+        }
+    }
 }

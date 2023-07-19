@@ -7,28 +7,22 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.avc.R
-import com.example.avc.database.entity.ProductEntity
+import com.example.avc.domain.model.TicketItem
+import com.example.avc.presentation.viewModel.AddTicketsViewModel
 
 @Composable
 fun AddItem(
-    product: ProductEntity
+    product: TicketItem,
+    uiEvent: (AddTicketsViewModel.AddTicketsEvent) -> Unit
 ) {
-    var quantity by remember { mutableStateOf(0) }
-    var showDialog by remember { mutableStateOf(false) }
-
     Card(
         modifier = Modifier.fillMaxSize(),
         border = BorderStroke(1.dp, colorResource(id = R.color.light_gray)),
@@ -55,7 +49,7 @@ fun AddItem(
 
                 Text(
                     modifier = Modifier.padding(start = 80.dp).align(Alignment.CenterStart),
-                    text = product.name,
+                    text = product.productName,
                     fontSize = 20.sp
                 )
 
@@ -69,7 +63,11 @@ fun AddItem(
                 ) {
                     Image(
                         modifier = Modifier
-                            .clickable { if (quantity > 0) quantity-- }
+                            .clickable {
+                                uiEvent(
+                                    AddTicketsViewModel.AddTicketsEvent.OnRemoveQuantity(product = product)
+                                )
+                            }
                             .size(50.dp),
                         painter = painterResource(id = R.drawable.ic_substract),
                         contentDescription = stringResource(
@@ -78,14 +76,22 @@ fun AddItem(
                     )
 
                     Text(
-                        modifier = Modifier.clickable { showDialog = true },
-                        text = quantity.toString(),
+                        modifier = Modifier.clickable {
+                            uiEvent(
+                                AddTicketsViewModel.AddTicketsEvent.ShowDialog(product)
+                            )
+                        },
+                        text = product.amount.toString(),
                         fontSize = 20.sp
                     )
 
                     Image(
                         modifier = Modifier
-                            .clickable { quantity++ }
+                            .clickable {
+                                uiEvent(
+                                    AddTicketsViewModel.AddTicketsEvent.OnAddQuantity(product = product)
+                                )
+                            }
                             .size(50.dp),
                         painter = painterResource(id = R.drawable.ic_add),
                         contentDescription = stringResource(
@@ -95,16 +101,5 @@ fun AddItem(
                 }
             }
         }
-    }
-
-    if (showDialog) {
-        CustomDialog(
-            onDismiss = { showDialog = false },
-            onConfirm = {
-                quantity = it.toInt()
-                showDialog = false
-            },
-            product = "Coca-Cola"
-        )
     }
 }
