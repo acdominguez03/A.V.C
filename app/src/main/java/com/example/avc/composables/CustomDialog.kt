@@ -32,7 +32,6 @@ fun CustomDialog(
     state: AddTicketsState,
     uiEvent: (AddTicketsViewModel.AddTicketsEvent) -> Unit
 ) {
-
     Dialog(
         onDismissRequest = {
             onDismiss()

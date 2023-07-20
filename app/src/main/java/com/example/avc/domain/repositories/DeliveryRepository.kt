@@ -7,5 +7,5 @@ interface DeliveryRepository {
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
-    suspend fun insertDelivery(deliveryEntity: DeliveryEntity)
+    suspend fun insertDeliveries(deliveries: List<DeliveryEntity>)
 }

@@ -73,9 +73,9 @@ val di = module {
     viewModelOf(::TicketViewModel)
 
     // Use Cases
-    factory { AddTicketsUseCase() }
-    factory { AddDeliveryUseCase() }
     factory { ProductPerTicketUseCase() }
     factory { TicketUseCase() }
     factory { ProductUseCase() }
+    factory { UserUseCase() }
+    factory { DeliveryUseCase() }
 }

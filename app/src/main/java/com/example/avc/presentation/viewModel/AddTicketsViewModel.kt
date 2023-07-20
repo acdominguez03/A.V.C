@@ -7,14 +7,18 @@ import com.example.avc.database.entity.ProductEntity
 import com.example.avc.database.entity.ProductPerTicketEntity
 import com.example.avc.database.entity.TicketEntity
 import com.example.avc.domain.model.TicketItem
-import com.example.avc.domain.usecase.AddTicketsUseCase
+import com.example.avc.domain.usecase.ProductPerTicketUseCase
+import com.example.avc.domain.usecase.ProductUseCase
+import com.example.avc.domain.usecase.TicketUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.time.Instant
 
 class AddTicketsViewModel(
-    private val useCase: AddTicketsUseCase
+    private val productUseCase: ProductUseCase,
+    private val ticketUseCase: TicketUseCase,
+    private val productPerTicketUseCase: ProductPerTicketUseCase,
 ) : ViewModel() {
 
     private val currentState = AddTicketsState()
@@ -28,8 +32,7 @@ class AddTicketsViewModel(
 
     private fun getProducts() {
         viewModelScope.launch {
-            useCase.getAllProducts().collect {
-                _uiState.value.products = it
+            productUseCase.getAllProducts().collect {
                 it.map { product ->
                     _uiState.value.productsPerTicket =
                         _uiState.value.productsPerTicket.toMutableList().apply {
@@ -43,6 +46,7 @@ class AddTicketsViewModel(
                             )
                         }
                 }
+                _uiState.value.products = it
             }
         }
     }
@@ -169,9 +173,9 @@ class AddTicketsViewModel(
 
     private fun createNewTicket(price: Double, products: List<TicketItem>) = viewModelScope.launch {
         val newTicket = TicketEntity(id = 0, price = price, date = Instant.now().epochSecond)
-        val ticketId = useCase.addNewTicket(newTicket)
+        val ticketId = ticketUseCase.addNewTicket(newTicket)
         ticketId?.let { id ->
-            useCase.addProductToTickets(
+            productPerTicketUseCase.addProductToTickets(
                 products.filter {
                     it.amount > 0
                 }.map {
@@ -184,7 +188,7 @@ class AddTicketsViewModel(
             )
         } ?: Log.e("AddTicketViewModel", "Error insertando los productos al ticket")
         updateProductsStock(products = products)
-        useCase.updateProducts(
+        productUseCase.updateProducts(
             _uiState.value.products
         )
         resetData()

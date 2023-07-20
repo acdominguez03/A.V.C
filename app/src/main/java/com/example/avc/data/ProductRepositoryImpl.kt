@@ -26,7 +26,7 @@ class ProductRepositoryImpl(
             productDAO.deleteAllProducts()
             Log.d("MY_TAG", "Productos borrados")
         } catch (e: IOException) {
-            Log.d("MY_TAG", "Error al obtener los productos de la BBDD")
+            Log.d("MY_TAG", "Error al borrar los productos de la BBDD")
         }
     }
 

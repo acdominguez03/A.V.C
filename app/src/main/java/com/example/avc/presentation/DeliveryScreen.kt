@@ -3,6 +3,7 @@ package com.example.avc.presentation
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -21,6 +22,8 @@ fun DeliveryScreen(
     viewModel: DeliveryViewModel,
     uiEvents: (DeliveryViewModel.DeliveryEvent) -> Unit
 ) {
+    val state = viewModel.uiState.collectAsState().value
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -29,7 +32,11 @@ fun DeliveryScreen(
     ) {
         CustomTopBar(title = stringResource(id = R.string.delivery_title))
 
-        CustomDropDownMenuTextField(items = viewModel.state.users)
+        CustomDropDownMenuTextField(
+            items = state.users,
+            uiEvents = uiEvents,
+            state = state
+        )
 
         LazyColumn(
             modifier = Modifier
@@ -37,13 +44,19 @@ fun DeliveryScreen(
                 .heightIn(min = 200.dp, max = 500.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
-            items(viewModel.state.products.size) { index ->
-                DeliveryItem(product = viewModel.state.products[index])
+            items(state.items) { product ->
+                DeliveryItem(
+                    item = product,
+                    state = state,
+                    uiEvents = uiEvents
+                )
             }
         }
 
         CustomButton(text = stringResource(id = R.string.add)) {
-
+            uiEvents(
+                DeliveryViewModel.DeliveryEvent.OnAddButtonSelected
+            )
         }
     }
 }

@@ -9,6 +9,6 @@ interface UserRepository {
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
     suspend fun insertAll(users: List<UserEntity>)
-
     fun getAllUsers(): Flow<List<UserEntity>>
+
 }

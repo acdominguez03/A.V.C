@@ -9,11 +9,12 @@ import java.io.IOException
 class DeliveryRepositoryImpl(
     private val deliveryDAO: DeliveryDAO
 ) : DeliveryRepository {
-    override suspend fun insertDelivery(deliveryEntity: DeliveryEntity) {
+    override suspend fun insertDeliveries(deliveries: List<DeliveryEntity>) {
         try {
-            deliveryDAO.insert(deliveryEntity)
+            deliveryDAO.insertDeliveries(deliveries = deliveries)
         } catch (e: IOException) {
-            Log.d("MY_TAG", "Error al añadir la entrega")
+            Log.d("MY_TAG", "Error al añadir las entregas")
         }
     }
+
 }

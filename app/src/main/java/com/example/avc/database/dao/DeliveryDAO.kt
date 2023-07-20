@@ -7,6 +7,6 @@ import com.example.avc.database.entity.DeliveryEntity
 
 @Dao
 interface DeliveryDAO {
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insert(deliveryEntity: DeliveryEntity)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertDeliveries(deliveries: List<DeliveryEntity>)
 }

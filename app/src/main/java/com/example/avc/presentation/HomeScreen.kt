@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -27,9 +28,7 @@ fun HomeScreen(
     viewModel: HomeViewModel = koinViewModel(),
     modifier: Modifier
 ) {
-    val products by viewModel.allProducts.collectAsState(
-        initial = emptyList()
-    )
+    val state = viewModel.uiState.collectAsState().value
 
     Column(
         modifier = modifier
@@ -56,15 +55,9 @@ fun HomeScreen(
                 verticalArrangement = Arrangement.spacedBy(20.dp),
                 horizontalArrangement = Arrangement.spacedBy(20.dp)
             ) {
-                items(products.size) { index ->
+                items(state.products) { product ->
                     HomeItem(
-                        product = ProductEntity(
-                            id = products[index].id,
-                            name = products[index].name,
-                            price = products[index].price,
-                            image = products[index].image,
-                            amount = products[index].amount
-                        )
+                        product = product
                     )
                 }
             }

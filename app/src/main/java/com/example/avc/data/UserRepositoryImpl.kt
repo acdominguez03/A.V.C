@@ -27,5 +27,4 @@ class UserRepositoryImpl(
             Log.d("MY_TAG", "Error al obtener los usuarios de la BBDD")
         }
     }
-
 }

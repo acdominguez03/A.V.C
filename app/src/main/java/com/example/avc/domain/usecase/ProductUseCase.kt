@@ -11,4 +11,20 @@ class ProductUseCase : KoinComponent {
     private val repository: ProductRepository by inject()
 
     fun getAllProducts(): Flow<List<ProductEntity>> = repository.getAllProducts()
+
+    suspend fun insert(productEntity: ProductEntity) {
+        repository.insertProduct(productEntity)
+    }
+
+    suspend fun insertAll(products: List<ProductEntity>) {
+        repository.insertAll(products)
+    }
+
+    suspend fun deleteAll() {
+        repository.deleteAllProducts()
+    }
+
+    suspend fun updateProducts(products: List<ProductEntity>) {
+        repository.updateProducts(products)
+    }
 }

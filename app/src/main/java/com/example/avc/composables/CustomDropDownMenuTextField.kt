@@ -1,7 +1,6 @@
 package com.example.avc.composables
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -21,28 +20,31 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.toSize
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.avc.R
 import com.example.avc.database.entity.UserEntity
+import com.example.avc.presentation.viewModel.DeliveryState
+import com.example.avc.presentation.viewModel.DeliveryViewModel
 
 @Composable
 fun CustomDropDownMenuTextField(
-    items: List<UserEntity>
+    items: List<UserEntity>,
+    uiEvents: (DeliveryViewModel.DeliveryEvent) -> Unit,
+    state: DeliveryState
 ) {
-    var text by remember { mutableStateOf("") }
     var textFieldSize by remember { mutableStateOf(Size.Zero) }
 
     var expanded by remember { mutableStateOf(false) }
-    val interactionSource = remember { MutableInteractionSource() }
 
     Column(
         modifier = Modifier
             .padding(top = 20.dp, start = 20.dp, end = 20.dp)
             .fillMaxWidth()
             .clickable(
-                interactionSource = interactionSource,
-                indication = null,
                 onClick = {
-                    expanded = false
+                    uiEvents(
+                        DeliveryViewModel.DeliveryEvent.OnDismissDropDown("", user = null)
+                    )
                 }
             )
     ) {
@@ -54,10 +56,11 @@ fun CustomDropDownMenuTextField(
                         .onGloballyPositioned { coordinates ->
                             textFieldSize = coordinates.size.toSize()
                         },
-                    value = text,
+                    value = state.userText,
                     onValueChange = {
-                        text = it
-                        expanded = true
+                        uiEvents(
+                            DeliveryViewModel.DeliveryEvent.OnUserTextChanged(it)
+                        )
                     },
                     label = { Text("Persona") },
                     colors = TextFieldDefaults.textFieldColors(
@@ -97,16 +100,17 @@ fun CustomDropDownMenuTextField(
                     LazyColumn(
                         modifier = Modifier.heightIn(max = 200.dp)
                     ) {
-                        if (text.isNotEmpty()) {
+                        if (state.userText.isNotEmpty()) {
                             items(
                                 items.filter {
                                     it.name.lowercase()
-                                        .contains(text.lowercase())
+                                        .contains(state.userText.lowercase())
                                 }
                             ) {
                                 PersonItem(title = it.name) { title ->
-                                    text = title
-                                    expanded = false
+                                    uiEvents(
+                                        DeliveryViewModel.DeliveryEvent.OnDismissDropDown(title, it)
+                                    )
                                 }
                             }
                         } else {
@@ -114,8 +118,9 @@ fun CustomDropDownMenuTextField(
                                 items
                             ) {
                                 PersonItem(title = it.name) { title ->
-                                    text = title
-                                    expanded = false
+                                    uiEvents(
+                                        DeliveryViewModel.DeliveryEvent.OnDismissDropDown(title, it)
+                                    )
                                 }
                             }
                         }

@@ -2,6 +2,8 @@ package com.example.avc.composables
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -10,18 +12,20 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.avc.R
-import com.example.avc.database.entity.ProductEntity
+import com.example.avc.database.entity.DeliveryStatus
+import com.example.avc.domain.model.DeliveryItemModel
+import com.example.avc.presentation.viewModel.DeliveryState
 import com.example.avc.presentation.viewModel.DeliveryViewModel
 
 @Composable
 fun DeliveryItem(
-    product: ProductEntity
+    item: DeliveryItemModel,
+    state: DeliveryState,
+    uiEvents: (DeliveryViewModel.DeliveryEvent) -> Unit
 ) {
     Card(
         modifier = Modifier.fillMaxSize(),
@@ -35,7 +39,7 @@ fun DeliveryItem(
             ) {
                 Text(
                     modifier = Modifier.align(Alignment.CenterStart).padding(start = 20.dp),
-                    text = product.name,
+                    text = item.product.name,
                     fontSize = 25.sp,
                     fontWeight = FontWeight.ExtraBold
                 )
@@ -43,17 +47,22 @@ fun DeliveryItem(
                 CustomDropDownMenu(
                     modifier = Modifier.align(Alignment.CenterEnd).padding(end = 20.dp),
                     values = arrayOf("1", "2", "3", "4", "5"),
-                    text = "Cantidad: "
+                    item = item,
+                    uiEvents = uiEvents
                 )
             }
 
-            Row(
+            LazyRow(
                 modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp),
                 horizontalArrangement = Arrangement.Center
             ) {
-                CustomCheckbox(text = stringResource(id = R.string.paid))
-                CustomCheckbox(text = stringResource(id = R.string.no_paid))
-                CustomCheckbox(text = stringResource(id = R.string.invitation))
+                items(state.checkBoxOptions) {
+                    CustomCheckbox(
+                        status = it,
+                        item = item,
+                        uiEvents = uiEvents
+                    )
+                }
             }
         }
     }
@@ -61,32 +70,36 @@ fun DeliveryItem(
 
 @Composable
 fun CustomDropDownMenu(
+    item: DeliveryItemModel,
     modifier: Modifier,
     values: Array<String>,
-    text: String?
+    uiEvents: (DeliveryViewModel.DeliveryEvent) -> Unit
 ) {
-    var expanded by remember { mutableStateOf(false) }
-
-    var currentValue by remember { mutableStateOf(values[0]) }
-
     Row(
         modifier = modifier
-            .clickable { expanded = !expanded }
+            .clickable {
+                uiEvents(
+                    DeliveryViewModel.DeliveryEvent.OnQuantityDropDownTouched(item)
+                )
+            }
     ) {
         Text(
-            text = if (text != null) text + currentValue else currentValue,
+            text = "Cantidad: ${item.quantity}",
             fontSize = 20.sp
         )
         Icon(imageVector = Icons.Filled.ArrowDropDown, contentDescription = "arrow")
 
-        DropdownMenu(expanded = expanded, onDismissRequest = {
-            expanded = false
+        DropdownMenu(expanded = item.expandDropDown, onDismissRequest = {
+            uiEvents(
+                DeliveryViewModel.DeliveryEvent.OnDismissQuantityDropDown(item)
+            )
         }) {
             values.forEach {
                 DropdownMenuItem(
                     onClick = {
-                        currentValue = it
-                        expanded = false
+                        uiEvents(
+                            DeliveryViewModel.DeliveryEvent.OnQuantitySelected(quantity = it, item = item)
+                        )
                     }
                 ) {
                     Text(text = it)
@@ -96,29 +109,30 @@ fun CustomDropDownMenu(
     }
 }
 
-@Preview
 @Composable
 fun CustomCheckbox(
-    text: String = "Pagado"
+    status: DeliveryStatus,
+    item: DeliveryItemModel,
+    uiEvents: (DeliveryViewModel.DeliveryEvent) -> Unit
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically
     ) {
-        var checked by remember { mutableStateOf(false) }
         Checkbox(
-            checked = checked,
+            checked = item.checkBoxStatus == status,
             onCheckedChange = {
-                checked = !checked
+                uiEvents(
+                    DeliveryViewModel.DeliveryEvent.OnCheckBoxSelected(status, item)
+                )
             },
             colors = CheckboxDefaults.colors(
                 checkmarkColor = colorResource(id = R.color.checkbox_mark_color),
                 checkedColor = colorResource(id = R.color.light_gray)
-
             )
         )
         Text(
             modifier = Modifier.padding(end = 12.dp),
-            text = text,
+            text = status.name,
             fontSize = 15.sp
         )
     }

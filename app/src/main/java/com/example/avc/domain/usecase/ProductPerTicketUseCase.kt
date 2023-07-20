@@ -10,4 +10,8 @@ class ProductPerTicketUseCase : KoinComponent {
     private val repository: ProductPerTicketRepository by inject()
 
     fun getAllProductsPerTickets(): Flow<List<ProductPerTicketEntity>> = repository.getAllProductsPerTicket()
+
+    suspend fun addProductToTickets(products: List<ProductPerTicketEntity>) {
+        return repository.insertProductsToTicket(products = products)
+    }
 }

@@ -2,18 +2,35 @@ package com.example.avc.presentation.viewModel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.avc.composables.custom_tab_bar.BottomBarScreen
 import com.example.avc.database.entity.ProductEntity
-import com.example.avc.domain.repositories.ProductRepository
+import com.example.avc.domain.usecase.ProductUseCase
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class HomeViewModel(
-    private val repository: ProductRepository
+    private val useCase: ProductUseCase
 ) : ViewModel() {
-    var allProducts = repository.getAllProducts()
+
+    private val _uiState: MutableStateFlow<HomeState> by lazy { MutableStateFlow(HomeState()) }
+    val uiState: StateFlow<HomeState> get() = _uiState
+
+    init {
+        viewModelScope.launch {
+            useCase.getAllProducts().collect {
+                _uiState.tryEmit(
+                    _uiState.value.copy(
+                        products = it
+                    )
+                )
+            }
+        }
+    }
 
     fun insertProducts() = viewModelScope.launch {
-        insertAll(
+        useCase.insertAll(
             listOf(
                 ProductEntity(id = 1, name = "Coca-Cola", price = 1.0, image = "R.drawable.ic_cocacola", 0),
                 ProductEntity(id = 2, name = "Coca-Cola Zero", price = 1.0, image = "R.drawable.ic_cocacola", 0),
@@ -27,15 +44,11 @@ class HomeViewModel(
         )
     }
 
-    fun insert(productEntity: ProductEntity) = viewModelScope.launch {
-        repository.insertProduct(productEntity)
-    }
-
-    fun insertAll(products: List<ProductEntity>) = viewModelScope.launch {
-        repository.insertAll(products)
-    }
-
     fun deleteAll() = viewModelScope.launch(Dispatchers.IO) {
-        repository.deleteAllProducts()
+        useCase.deleteAll()
     }
 }
+
+data class HomeState(
+    var products: List<ProductEntity> = emptyList()
+)
