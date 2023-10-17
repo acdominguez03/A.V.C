@@ -2,16 +2,16 @@ package com.example.avc.presentation.viewModel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.avc.composables.custom_tab_bar.BottomBarScreen
 import com.example.avc.database.entity.ProductEntity
 import com.example.avc.domain.usecase.ProductUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class HomeViewModel(
-    private val useCase: ProductUseCase
+    private val useCase: ProductUseCase,
 ) : ViewModel() {
 
     private val _uiState: MutableStateFlow<HomeState> by lazy { MutableStateFlow(HomeState()) }
@@ -20,11 +20,14 @@ class HomeViewModel(
     init {
         viewModelScope.launch {
             useCase.getAllProducts().collect {
-                _uiState.tryEmit(
-                    _uiState.value.copy(
-                        products = it
+                useCase.getProfits().collect { profits ->
+                    _uiState.tryEmit(
+                        _uiState.value.copy(
+                            products = it,
+                            profits = profits,
+                        ),
                     )
-                )
+                }
             }
         }
     }
@@ -39,8 +42,8 @@ class HomeViewModel(
                 ProductEntity(id = 5, name = "Cerveza", price = 1.0, image = "R.drawable.ic_beer", 0),
                 ProductEntity(id = 6, name = "Cerveza 0%", price = 1.0, image = "R.drawable.ic_beer0", 0),
                 ProductEntity(id = 7, name = "Fanta", price = 1.0, image = "R.drawable.ic_fanta", 0),
-                ProductEntity(id = 8, name = "Helado", price = 1.0, image = "R.drawable.ic_icecream", 0)
-            )
+                ProductEntity(id = 8, name = "Helado", price = 1.0, image = "R.drawable.ic_icecream", 0),
+            ),
         )
     }
 
@@ -50,5 +53,6 @@ class HomeViewModel(
 }
 
 data class HomeState(
-    var products: List<ProductEntity> = emptyList()
+    var products: List<ProductEntity> = emptyList(),
+    var profits: Double = 0.0,
 )

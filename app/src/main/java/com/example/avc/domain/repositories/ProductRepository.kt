@@ -23,4 +23,8 @@ interface ProductRepository {
     @Suppress("RedundantSuspendModifier")
     @WorkerThread@Update
     suspend fun updateProducts(products: List<ProductEntity>)
+
+    @Suppress("RedundantSuspendModifier")
+    @WorkerThread
+    suspend fun getProfits(): Flow<Double>
 }

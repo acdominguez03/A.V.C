@@ -25,7 +25,8 @@ fun CustomTopBar(
     title: String,
     withIcons: Boolean = false,
     withProfits: Boolean = false,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    profits: Double = 0.0
 ) {
     Row(
         modifier = Modifier
@@ -53,8 +54,12 @@ fun CustomTopBar(
 
         if (withProfits) {
             Text(
-                text = "- 50€",
-                color = colorResource(id = R.color.red),
+                text = profits.toString(),
+                color = if (profits < 0) {
+                    colorResource(id = R.color.red)
+                } else {
+                    colorResource(id = R.color.green)
+                },
                 fontSize = 25.sp
             )
         }

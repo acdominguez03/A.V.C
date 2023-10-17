@@ -5,6 +5,7 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -27,12 +28,20 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.toSize
 import com.example.avc.R
+import com.example.avc.composables.CustomExpensesDialog
 import com.example.avc.composables.CustomTopBar
-import com.example.avc.database.entity.ProductEntity
+import com.example.avc.database.entity.UserEntity
+import com.example.avc.domain.model.ExpensesItemModel
+import com.example.avc.presentation.viewModel.ExpensesState
+import com.example.avc.presentation.viewModel.ExpensesViewModel
 
 @Composable
-fun ExpensesScreen() {
+fun ExpensesScreen(
+    viewModel: ExpensesViewModel,
+    uiEvents: (ExpensesViewModel.ExpensesEvent) -> Unit
+) {
     var boxSize by remember { mutableStateOf(Size.Zero) }
+    val state = viewModel.uiState.collectAsState().value
 
     Column(
         modifier = Modifier
@@ -51,36 +60,13 @@ fun ExpensesScreen() {
                 },
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
-            items(4) {
-                val items = remember {
-                    mutableStateListOf(
-                        ProductSale(
-                            product = ProductEntity(
-                                id = 0,
-                                name = "Coca-Cola",
-                                price = 1.0,
-                                image = "",
-                                amount = 10
-                            ),
-                            quantity = 4
-                        ),
-                        ProductSale(
-                            product = ProductEntity(
-                                id = 0,
-                                name = "Coca-Cola Zero",
-                                price = 1.0,
-                                image = "",
-                                amount = 10
-                            ),
-                            quantity = 2
-                        )
-                    )
-                }
-
+            items(state.usersWithExpenses) {
                 ExpensesItem(
-                    name = "Pedro Panadero",
-                    items = items,
-                    boxSize = boxSize
+                    user = it,
+                    items = viewModel.getUserExpenses(it.id),
+                    boxSize = boxSize,
+                    state = state,
+                    uiEvents = uiEvents
                 )
             }
         }
@@ -90,15 +76,17 @@ fun ExpensesScreen() {
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ExpensesItem(
-    name: String,
-    items: MutableList<ProductSale>,
-    boxSize: Size
+    user: UserEntity,
+    items: MutableList<ExpensesItemModel>,
+    boxSize: Size,
+    state: ExpensesState,
+    uiEvents: (ExpensesViewModel.ExpensesEvent) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
     var money: Double = if (items.isNotEmpty()) {
         var finalMoney = 0.0
         items.forEach {
-            finalMoney += it.product.price * it.quantity
+            finalMoney += it.productPrice * it.quantity
         }
         finalMoney
     } else {
@@ -128,7 +116,7 @@ fun ExpensesItem(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = name,
+                            text = user.name,
                             fontSize = 20.sp,
                             fontWeight = FontWeight.ExtraBold
                         )
@@ -140,7 +128,9 @@ fun ExpensesItem(
                             fontWeight = FontWeight.ExtraBold
                         )
                         IconButton(
-                            onClick = { expanded = !expanded }
+                            onClick = {
+                                expanded = !expanded
+                            }
                         ) {
                             Icon(
                                 imageVector = Icons.Rounded.ArrowDropDown,
@@ -166,6 +156,10 @@ fun ExpensesItem(
                             confirmStateChange = {
                                 if (it == DismissValue.DismissedToStart) {
                                     items.remove(currentItem)
+                                } else if (it == DismissValue.DismissedToEnd) {
+                                    uiEvents(
+                                        ExpensesViewModel.ExpensesEvent.ShowExpensesDialog
+                                    )
                                 }
                                 true
                             }
@@ -179,7 +173,11 @@ fun ExpensesItem(
                                 SwipeBackground(dismissState = dismissState)
                             },
                             dismissContent = {
-                                ProductItem(productSale = item)
+                                ProductItem(
+                                    expensesItem = item,
+                                    state = state,
+                                    uiEvents = uiEvents
+                                )
                             }
                         )
                     }
@@ -230,7 +228,11 @@ fun SwipeBackground(dismissState: DismissState) {
 }
 
 @Composable
-fun ProductItem(productSale: ProductSale) {
+fun ProductItem(
+    state: ExpensesState,
+    expensesItem: ExpensesItemModel,
+    uiEvents: (ExpensesViewModel.ExpensesEvent) -> Unit
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -249,12 +251,12 @@ fun ProductItem(productSale: ProductSale) {
                 horizontalArrangement = Arrangement.Start
             ) {
                 Text(
-                    text = "${productSale.quantity} x ",
+                    text = "${expensesItem.quantity} x ",
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = productSale.product.name,
+                    text = expensesItem.productName,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -262,15 +264,28 @@ fun ProductItem(productSale: ProductSale) {
             Text(
                 modifier = Modifier
                     .align(Alignment.CenterEnd),
-                text = "${productSale.quantity * productSale.product.price}€",
+                text = "${expensesItem.quantity * expensesItem.productPrice}€",
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold
             )
         }
     }
-}
 
-data class ProductSale(
-    val product: ProductEntity,
-    val quantity: Int
-)
+    if (state.showExpensesDialog) {
+        CustomExpensesDialog(
+            onDismiss = {
+                uiEvents(
+                    ExpensesViewModel.ExpensesEvent.OnCancelExpensesDialog
+                )
+            },
+            onConfirm = { quantity, item ->
+                uiEvents(
+                    ExpensesViewModel.ExpensesEvent.OnConfirmExpensesDialog(quantity = quantity, item = item)
+                )
+            },
+            state = state,
+            item = expensesItem,
+            uiEvents = uiEvents
+        )
+    }
+}

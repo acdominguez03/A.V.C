@@ -53,4 +53,12 @@ class ProductRepositoryImpl(
             Log.d("MY_TAG", "Error al actualizar los productos de la BBDD")
         }
     }
+
+    override suspend fun getProfits(): Flow<Double> = flow {
+        try {
+            emitAll(productDAO.getProfits())
+        } catch (e: IOException) {
+            Log.d("MY_TAG", "Error al obtener los beneficios de la BBDD")
+        }
+    }
 }

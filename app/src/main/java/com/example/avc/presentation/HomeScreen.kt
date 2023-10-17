@@ -43,7 +43,8 @@ fun HomeScreen(
                 .size(40.dp)
                 .clickable {
                     navController.navigate(BottomBarScreen.Tickets.route)
-                }
+                },
+            profits = state.profits
         )
 
         Column(

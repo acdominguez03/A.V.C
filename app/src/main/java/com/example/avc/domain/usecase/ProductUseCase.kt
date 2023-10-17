@@ -27,4 +27,6 @@ class ProductUseCase : KoinComponent {
     suspend fun updateProducts(products: List<ProductEntity>) {
         repository.updateProducts(products)
     }
+
+    suspend fun getProfits(): Flow<Double> = repository.getProfits()
 }

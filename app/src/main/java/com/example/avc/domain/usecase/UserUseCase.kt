@@ -1,6 +1,7 @@
 package com.example.avc.domain.usecase
 
 import com.example.avc.database.entity.UserEntity
+import com.example.avc.domain.model.ExpensesItemModel
 import com.example.avc.domain.repositories.UserRepository
 import kotlinx.coroutines.flow.Flow
 import org.koin.core.component.KoinComponent
@@ -12,6 +13,14 @@ class UserUseCase : KoinComponent {
 
     fun getAllUsers(): Flow<List<UserEntity>> {
         return repository.getAllUsers()
+    }
+
+    fun getUsersWithExpenses(): Flow<List<UserEntity>> {
+        return repository.getUsersWithExpenses()
+    }
+
+    fun getUserExpenses(userId: Long): Flow<List<ExpensesItemModel>> {
+        return repository.getUserExpenses(userId)
     }
 
     suspend fun insertAllUsers() {

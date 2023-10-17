@@ -29,4 +29,11 @@ interface ProductDAO {
             update(it.amount, it.id)
         }
     }
+
+    @Query(
+        "SELECT COUNT(delivery_table.user_id) - (SELECT SUM(ticket_table.price) FROM ticket_table) " +
+            "FROM delivery_table " +
+            "WHERE delivery_table.status = 'PAID' OR delivery_table.status = 'INVITATION'"
+    )
+    fun getProfits(): Flow<Double>
 }

@@ -1,7 +1,6 @@
 package com.example.avc.composables.custom_tab_bar
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -9,6 +8,7 @@ import androidx.navigation.compose.composable
 import com.example.avc.presentation.*
 import com.example.avc.presentation.viewModel.AddTicketsViewModel
 import com.example.avc.presentation.viewModel.DeliveryViewModel
+import com.example.avc.presentation.viewModel.ExpensesViewModel
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -35,7 +35,8 @@ fun BottomNavGraph(
         }
 
         composable(route = BottomBarScreen.Expenses.route) {
-            ExpensesScreen()
+            val viewModel: ExpensesViewModel = koinViewModel()
+            ExpensesScreen(viewModel = viewModel, uiEvents = { viewModel.handleEvent(it) })
         }
 
         composable(route = BottomBarScreen.Tickets.route) {
